@@ -1,0 +1,16 @@
+version: '3.3'
+
+services:
+  database:
+    image: postgres:15
+    environment:
+      - POSTGRES_DB=chord-app
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=root
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
