@@ -6,6 +6,8 @@ import {
   Patch,
   Param,
   Delete,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { AcordesService } from './acordes.service';
 import { CreateAcordeDto } from './dto/create-acorde.dto';
@@ -16,18 +18,38 @@ export class AcordesController {
   constructor(private readonly acordesService: AcordesService) {}
 
   @Post()
-  create(@Body() body: any) {
-    return this.acordesService.create(body);
+  async create(@Body() createAcordeDto: CreateAcordeDto) {
+    try {
+      const newAcorde = await this.acordesService.create(createAcordeDto);
+      return {
+        message: 'Nuevo acorde creado',
+        data: newAcorde,
+      };
+    } catch (error) {
+      throw new HttpException(
+        'Error al crear la entidad',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   @Get()
-  findAll() {
+  async findAll() {
     return this.acordesService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.acordesService.findOne(+id);
+  async findOne(@Param('id') id: number) {
+    const data = await this.acordesService.findOne(+id);
+    if (!data) {
+      return {
+        message: `El acorde con ID ${id} no fue encontrada.`,
+      };
+    }
+    return {
+      message: 'Acorde Encontrado',
+      data: data,
+    };
   }
 
   @Patch(':id')

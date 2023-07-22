@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAcordeDto } from './dto/create-acorde.dto';
 import { UpdateAcordeDto } from './dto/update-acorde.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -12,17 +12,21 @@ export class AcordesService {
     private acordeRepo: Repository<Acorde>,
   ) {}
 
-  create(body: any) {
-    const newAcorde = this.acordeRepo.create(body);
+  // create(body: any) {
+  //   const newAcorde = this.acordeRepo.create(body);
+  //   return this.acordeRepo.save(newAcorde);
+  // }
+  async create(createAcordeDto: CreateAcordeDto): Promise<Acorde> {
+    const newAcorde = this.acordeRepo.create(createAcordeDto);
     return this.acordeRepo.save(newAcorde);
   }
 
-  findAll() {
-    return `This action returns all acordes`;
+  async findAll(): Promise<Acorde[]> {
+    return this.acordeRepo.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} acorde`;
+  async findOne(id: number): Promise<Acorde | undefined> {
+    return this.acordeRepo.findOneBy({ id });
   }
 
   update(id: number, updateAcordeDto: UpdateAcordeDto) {
