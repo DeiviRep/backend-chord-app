@@ -9,7 +9,7 @@ import { Repository } from 'typeorm';
 export class AcordesService {
   constructor(
     @InjectRepository(Acorde)
-    private acordeRepo: Repository<Acorde>,
+    private readonly acordeRepo: Repository<Acorde>,
   ) {}
 
   // create(body: any) {
@@ -29,11 +29,20 @@ export class AcordesService {
     return this.acordeRepo.findOneBy({ id });
   }
 
-  update(id: number, updateAcordeDto: UpdateAcordeDto) {
-    return `This action updates a #${id} acorde`;
+  async update(id: number, updateAcordeDto: UpdateAcordeDto): Promise<Acorde> {
+    const dataAcorde = await this.acordeRepo.findOneBy({ id });
+    if (!dataAcorde) {
+      throw new NotFoundException('No se encontró la entidad');
+    }
+    Object.assign(dataAcorde, updateAcordeDto);
+    return this.acordeRepo.save(dataAcorde);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} acorde`;
+  async remove(id: number): Promise<void> {
+    const dataAcorde = await this.acordeRepo.findOneBy({ id });
+    if (!dataAcorde) {
+      throw new NotFoundException(`La entidad con el ID '${id}' no existe`);
+    }
+    await this.acordeRepo.remove(dataAcorde);
   }
 }
